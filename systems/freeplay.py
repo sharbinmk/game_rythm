@@ -10,6 +10,13 @@ def freeplay(screen):
     running = True
     sparkle_timer = 0
 
+    # Centered card positions
+    card1_pos = (330, 230)   # Fraq
+    card2_pos = (690, 230)   # Chapter 3 Hard
+
+    # Back button
+    back_rect = pygame.Rect(35, 35, 180, 60)
+
     while running:
         sparkle_timer -= 1
 
@@ -24,7 +31,7 @@ def freeplay(screen):
                 return False
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE:
                     return False
 
                 if event.key == pygame.K_1:
@@ -32,6 +39,13 @@ def freeplay(screen):
 
                 if event.key == pygame.K_2:
                     return "hard_chapter3_song"
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mx, my = pygame.mouse.get_pos()
+
+                    if back_rect.collidepoint(mx, my):
+                        return False
 
         # Background
         draw_BG(screen, TOP_COLOR, BOT_COLOR)
@@ -49,20 +63,52 @@ def freeplay(screen):
         screen.blit(bgdeco4, BG4DECO_POS)
         screen.blit(bgdeco5, BG5DECO_POS)
 
+        # Dylan's original freeplay background images
         screen.blit(FreeplaySelectWIP, FREE_PLAY_SELECT_POS)
+        screen.blit(FreeplayWIPtxt, FREE_PLAY_WIP_TXT)
 
-        # Simple difficulty text
+        # Back button top-left
+        pygame.draw.rect(screen, (20, 24, 50), back_rect, border_radius=20)
+        pygame.draw.rect(screen, (190, 195, 255), back_rect, width=2, border_radius=20)
+
+        back_text = font.render("BACK", True, (245, 245, 255))
+        screen.blit(back_text, back_text.get_rect(center=back_rect.center))
+
+        # Title
         title = font.render("FREEPLAY", True, (230, 230, 255))
-        normal = small_font.render("Press 1 - Normal", True, (200, 200, 255))
-        hard = small_font.render("Press 2 - Hard", True, (255, 220, 120))
-        back = small_font.render("Press Space - Back", True, (220, 220, 220))
+        screen.blit(title, title.get_rect(center=(WIDTH // 2, 145)))
 
-        screen.blit(title, title.get_rect(center=(WIDTH // 2, 170)))
-        screen.blit(normal, normal.get_rect(center=(WIDTH // 2, 260)))
-        screen.blit(hard, hard.get_rect(center=(WIDTH // 2, 310)))
-        screen.blit(back, back.get_rect(center=(WIDTH // 2, 390)))
+        # Left side hint
+        left_hint = font.render("PRESS 1", True, (80, 90, 130))
+        screen.blit(left_hint, left_hint.get_rect(center=(210, 345)))
 
-        screen.blit(FreeplayExitBtn, FREE_PLAY_EXIT_BTN)
+        # Right side hint
+        right_hint = font.render("PRESS 2", True, (80, 90, 130))
+        screen.blit(right_hint, right_hint.get_rect(center=(1120, 345)))
+
+        # Card 1 - Fraq
+        card1 = FreeplayWIPlevel.copy()
+        screen.blit(card1, card1_pos)
+
+        fraq_press = small_font.render("Press 1", True, (230, 230, 255))
+        fraq_song = small_font.render("Fraq", True, (255, 255, 255))
+        fraq_mode = small_font.render("Normal", True, (200, 200, 255))
+
+        screen.blit(fraq_press, fraq_press.get_rect(center=(card1_pos[0] + 175, card1_pos[1] + 310)))
+        screen.blit(fraq_song, fraq_song.get_rect(center=(card1_pos[0] + 175, card1_pos[1] + 350)))
+        screen.blit(fraq_mode, fraq_mode.get_rect(center=(card1_pos[0] + 175, card1_pos[1] + 385)))
+
+        # Card 2 - Chapter 3 Hard
+        card2 = FreeplayWIPlevel.copy()
+        screen.blit(card2, card2_pos)
+
+        hard_press = small_font.render("Press 2", True, (255, 230, 160))
+        hard_song = small_font.render("Chapter 3", True, (255, 255, 255))
+        hard_mode = small_font.render("Hard", True, (255, 220, 120))
+
+        screen.blit(hard_press, hard_press.get_rect(center=(card2_pos[0] + 175, card2_pos[1] + 310)))
+        screen.blit(hard_song, hard_song.get_rect(center=(card2_pos[0] + 175, card2_pos[1] + 350)))
+        screen.blit(hard_mode, hard_mode.get_rect(center=(card2_pos[0] + 175, card2_pos[1] + 385)))
 
         pygame.display.flip()
 
