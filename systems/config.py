@@ -53,7 +53,7 @@ TOP_LANE_Y = 181
 BOTTOM_LANE_Y = 274
 DUAL_LANE_Y = 181
 
-NOTE_SPEED = -7.4167   # pixels per frame
+NOTE_SPEED = -14   # pixels per frame
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
