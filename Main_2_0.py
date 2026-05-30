@@ -358,6 +358,60 @@ def update_cutscene_chars(dt):
     _cs_chars_shown = min(int(_cs_char_timer), len(full))
     if _cs_chars_shown >= len(full):
         _cs_all_shown = True
+# ── Cutscene character surfaces (loaded once) ─────────────────────────────────
+_cs_char_surfs = {}
+
+def _get_cs_char(name):
+    if name not in _cs_char_surfs:
+        try:
+            raw = pygame.image.load(os.path.join(PROJECT_ROOT, "Assets", f"{name}.png")).convert_alpha()
+            h = 420
+            w = int(raw.get_width() * h / raw.get_height())
+            _cs_char_surfs[name] = pygame.transform.smoothscale(raw, (w, h))
+        except:
+            _cs_char_surfs[name] = None
+    return _cs_char_surfs[name]
+
+def _draw_cutscene_character(surface):
+    if cutscene_is_outro and not cutscene_pass:
+        img = _get_cs_char("ribbon_smile")
+    else:
+        img = _get_cs_char("ribbon_happy")
+    if img is None:
+        return
+    bob = int(math.sin(pygame.time.get_ticks() * 0.002) * 6)
+    x = WIDTH - img.get_width() - 18
+    y = HEIGHT - img.get_height() - 60 + bob
+    surface.blit(img, (x, y))
+
+def _draw_key(surface, label, cx, cy, size=38):
+    s = pygame.Surface((size, size), pygame.SRCALPHA)
+    pygame.draw.rect(s, (30, 34, 65, 220), s.get_rect(), border_radius=8)
+    pygame.draw.rect(s, (*LAVENDER, 180), s.get_rect(), width=2, border_radius=8)
+    surface.blit(s, (cx - size//2, cy - size//2))
+    k = tiny_font.render(label, True, WHITE)
+    surface.blit(k, k.get_rect(center=(cx, cy)))
+
+def _draw_controls_bar(surface):
+    bar_y = HEIGHT - 100
+    bar_h = 72
+    draw_panel(60, bar_y, WIDTH - 120, bar_h, alpha=190, border_col=(50, 54, 90), radius=14)
+    lbl = tiny_font.render("CONTROLS:", True, GOLD)
+    surface.blit(lbl, (80, bar_y + 10))
+    top_lbl = tiny_font.render("Top lane", True, LAVENDER)
+    surface.blit(top_lbl, (80, bar_y + 34))
+    for i, k in enumerate(["A", "S", "D"]):
+        _draw_key(surface, k, 200 + i * 48, bar_y + bar_h // 2)
+    pygame.draw.line(surface, (50, 54, 90), (310, bar_y + 10), (310, bar_y + bar_h - 10))
+    bot_lbl = tiny_font.render("Bottom lane", True, LAVENDER)
+    surface.blit(bot_lbl, (324, bar_y + 34))
+    for i, k in enumerate(["J", "K", "L"]):
+        _draw_key(surface, k, 460 + i * 48, bar_y + bar_h // 2)
+    pygame.draw.line(surface, (50, 54, 90), (570, bar_y + 10), (570, bar_y + bar_h - 10))
+    esc_lbl = tiny_font.render("Hold ESC to quit", True, (160, 160, 180))
+    surface.blit(esc_lbl, (585, bar_y + 26))
+    enter_lbl = tiny_font.render("ENTER = confirm / advance story", True, (160, 160, 180))
+    surface.blit(enter_lbl, (820, bar_y + 26))
 
 def draw_cutscene():
     global _cs_blink
@@ -395,6 +449,8 @@ def draw_cutscene():
         y_off += 36
 
     # Prompt
+    _draw_cutscene_character(screen)
+    _draw_controls_bar(screen)
     _cs_blink = (_cs_blink + 1) % 90
     if _cs_all_shown and _cs_blink < 55:
         prompt = "[ENTER] Continue" if not cutscene_is_outro else "[ENTER] Continue  |  [ESC] Chapter Select"
