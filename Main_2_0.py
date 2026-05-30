@@ -7,6 +7,11 @@ import math
 import os
 import sys
 
+sys.path.append("systems")
+
+from freeplay import freeplay
+
+ 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PROJECT_ROOT)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "systems"))
@@ -589,7 +594,7 @@ class ChapterButton:
         )
 
 # ─── Main menu buttons ────────────────────────────────────────────────────────
-BW, BH = 520, 80
+BW, BH = 520, 85
 CX = WIDTH // 2 - BW // 2
 
 def _select_chapter(idx):
@@ -607,13 +612,29 @@ def _open_story():
     state = STORY_SELECT
     selected_index = 0
 
+def _open_freeplay():
+    selected_song = freeplay(screen)
+
+    if selected_song:
+        pygame.mixer.music.stop()
+        acc = gameplay(screen, selected_song)
+        result_screen(screen, acc)
+
+        try:
+            pygame.mixer.music.load("music/Background_Music.mp3")
+            pygame.mixer.music.set_volume(0.8)
+            pygame.mixer.music.play(-1)
+        except:
+            pass
+
 def _quit():
     global running
     running = False
 
 main_buttons = [
-    MenuButton("STORY MODE", CX, 300, BW, BH, _open_story,   sub="Ino's Journey"),
-    MenuButton("QUIT",        CX, 420, BW, BH, _quit),
+    MenuButton("STORY MODE", CX, 290, BW, BH, _open_story,   sub="Ino's Journey"),
+    MenuButton("FREEPLAY",   CX, 410, BW, BH, _open_freeplay, sub="Play any song"),
+    MenuButton("QUIT",        CX, 530, BW, BH, _quit),
 ]
 
 chapter_buttons = [
@@ -622,7 +643,7 @@ chapter_buttons = [
     ChapterButton(2, WIDTH//2 - 560, 550, 520, 155),
 ]
 
-back_btn = MenuButton("BACK", WIDTH//2 - 120, HEIGHT - 90, 240, 62, lambda: _go_main())
+back_btn = MenuButton("BACK", 35, 48, 180, 62, lambda: _go_main())
 
 def _go_main():
     global state, selected_index
@@ -652,12 +673,30 @@ def draw_page_title(title_text, sub_text, col=WHITE):
     s = small_font.render(sub_text, True, LAVENDER)
     screen.blit(s, s.get_rect(center=(WIDTH//2, 102)))
 
+def wrap_text(text, font, max_width):
+    words = text.split(" ")
+    lines = []
+    current = ""
+
+    for word in words:
+        test = current + word + " "
+        if font.size(test)[0] <= max_width:
+            current = test
+        else:
+            lines.append(current.strip())
+            current = word + " "
+
+    if current:
+        lines.append(current.strip())
+
+    return lines
+
 # ─── Story select: right panel showing chapter story preview ──────────────────
 def draw_story_panel():
     if 0 <= selected_index < 3:
         chap = STORY_CHAPTERS[selected_index]
         locked = selected_index > 0 and not chapters_cleared[selected_index - 1]
-        px, py, pw, ph = WIDTH//2 + 20, 185, 560, 520
+        px, py, pw, ph = WIDTH//2 + 190, 185, 460, 520
         draw_panel(px, py, pw, ph, alpha=200, border_col=GOLD if chapters_cleared[selected_index] else LAVENDER, radius=16)
 
         screen.blit(small_font.render(chap["title"], True, GOLD), (px + 20, py + 18))
@@ -669,15 +708,20 @@ def draw_story_panel():
             hint = small_font.render("Complete the previous chapter first.", True, (80, 80, 120))
             screen.blit(hint, hint.get_rect(center=(px + pw//2, py + ph//2 + 44)))
         else:
-            preview_lines = chap["intro"][:7]
+            preview_lines = chap["intro"][:4]
             y_off = py + 62
+
             for ln in preview_lines:
                 if ln == "":
                     y_off += 14
                     continue
-                surf = tiny_font.render(ln, True, (160, 165, 210))
-                screen.blit(surf, (px + 20, y_off))
-                y_off += 26
+
+                wrapped = wrap_text(ln, tiny_font, pw - 40)
+
+                for line in wrapped:
+                    surf = tiny_font.render(line, True, (160, 165, 210))
+                    screen.blit(surf, (px + 20, y_off))
+                    y_off += 24
 
             # Requirements
             y_off = py + ph - 120
@@ -685,10 +729,11 @@ def draw_story_panel():
             y_off += 12
             screen.blit(small_font.render(f"Pass accuracy:  {chap['pass_acc']:.0f}%", True, TEAL),    (px + 20, y_off))
             screen.blit(small_font.render(f"Note speed:     ×{chap['speed_mult']}",    True, TEAL),    (px + 20, y_off + 30))
-            screen.blit(small_font.render(f"Controls:  A/S/D  ←top lane   J/K/L  ←bottom", True, LAVENDER), (px + 20, y_off + 62))
+            screen.blit(tiny_font.render("Controls: A/S/D top", True, LAVENDER), (px + 20, y_off + 62))
+            screen.blit(tiny_font.render("J/K/L bottom", True, LAVENDER), (px + 20, y_off + 86))
 
-            enter_hint = small_font.render("[ENTER] or click to play", True, WHITE)
-            screen.blit(enter_hint, enter_hint.get_rect(center=(px + pw//2, py + ph - 24)))
+            enter_hint = tiny_font.render("[ENTER] or click to play", True, WHITE)
+            screen.blit(enter_hint, enter_hint.get_rect(center=(px + pw//2, py + ph + 22)))
 
 # ─── Screens ──────────────────────────────────────────────────────────────────
 def draw_main_menu():
