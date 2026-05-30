@@ -2,11 +2,13 @@
 
 import pygame
 import os
+import math
 from assets import *
 from config import *
 from gameplayui import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 def load_sound(path, vol=0.4):
     try:
@@ -16,11 +18,20 @@ def load_sound(path, vol=0.4):
     except:
         return None
 
+
 def load_pointer():
     try:
         return pygame.image.load(os.path.join(BASE_DIR, "Assets/ui/Pointer.png")).convert_alpha()
     except:
         return None
+
+
+def menu_font(size, bold=False):
+    try:
+        return pygame.font.SysFont("georgia", size, bold=bold)
+    except:
+        return pygame.font.Font(None, size)
+
 
 def freeplay(screen):
     clock = pygame.time.Clock()
@@ -30,6 +41,8 @@ def freeplay(screen):
     click_sound = load_sound("music/Menu Selection Click.wav", 0.4)
     hover_sound = load_sound("music/Hovering.mp3", 0.25)
     pointer_img = load_pointer()
+
+    button_font = menu_font(42, bold=True)
 
     # Centered card positions
     card1_pos = (350, 250)   # Normal / Fraq
@@ -41,23 +54,11 @@ def freeplay(screen):
     card1_rect = pygame.Rect(card1_pos[0], card1_pos[1], card_w, card_h)
     card2_rect = pygame.Rect(card2_pos[0], card2_pos[1], card_w, card_h)
 
-    cards = [
-        {
-            "rect": card1_rect,
-            "image": FreeplayWIPlevel,
-            "song": "Fraq",
-        },
-        {
-            "rect": card2_rect,
-            "image": FreeplayHardlevel,
-            "song": "hard_chapter3_song",
-        }
-    ]
+    back_rect = pygame.Rect(WIDTH // 2 - 130, 635, 260, 70)
 
+    # 0 = Normal, 1 = Hard, 2 = Back
     selected_index = 0
-    last_selected = -1
-
-    back_rect = pygame.Rect(35, 35, 180, 60)
+    last_selected = selected_index
 
     while running:
         sparkle_timer -= 1
@@ -79,10 +80,22 @@ def freeplay(screen):
                     return False
 
                 if event.key == pygame.K_LEFT:
-                    selected_index = (selected_index - 1) % len(cards)
+                    if selected_index in (0, 1):
+                        selected_index = 0
+                    else:
+                        selected_index = 0
 
                 elif event.key == pygame.K_RIGHT:
-                    selected_index = (selected_index + 1) % len(cards)
+                    if selected_index in (0, 1):
+                        selected_index = 1
+                    else:
+                        selected_index = 1
+
+                elif event.key == pygame.K_DOWN:
+                    selected_index = 2
+
+                elif event.key == pygame.K_UP:
+                    selected_index = 0
 
                 elif event.key == pygame.K_1:
                     if click_sound:
@@ -97,29 +110,42 @@ def freeplay(screen):
                 elif event.key == pygame.K_RETURN:
                     if click_sound:
                         click_sound.play()
-                    return cards[selected_index]["song"]
+
+                    if selected_index == 0:
+                        return "Fraq"
+                    elif selected_index == 1:
+                        return "hard_chapter3_song"
+                    elif selected_index == 2:
+                        return False
 
             if event.type == pygame.MOUSEMOTION:
                 mx, my = pygame.mouse.get_pos()
 
-                for i, card in enumerate(cards):
-                    if card["rect"].collidepoint(mx, my):
-                        selected_index = i
+                if card1_rect.collidepoint(mx, my):
+                    selected_index = 0
+                elif card2_rect.collidepoint(mx, my):
+                    selected_index = 1
+                elif back_rect.collidepoint(mx, my):
+                    selected_index = 2
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mx, my = pygame.mouse.get_pos()
 
+                    if card1_rect.collidepoint(mx, my):
+                        if click_sound:
+                            click_sound.play()
+                        return "Fraq"
+
+                    if card2_rect.collidepoint(mx, my):
+                        if click_sound:
+                            click_sound.play()
+                        return "hard_chapter3_song"
+
                     if back_rect.collidepoint(mx, my):
                         if click_sound:
                             click_sound.play()
                         return False
-
-                    for card in cards:
-                        if card["rect"].collidepoint(mx, my):
-                            if click_sound:
-                                click_sound.play()
-                            return card["song"]
 
         if selected_index != last_selected:
             if hover_sound:
@@ -142,44 +168,76 @@ def freeplay(screen):
         screen.blit(bgdeco4, BG4DECO_POS)
         screen.blit(bgdeco5, BG5DECO_POS)
 
-        # Bring back Dylan's top freeplay message
+        # Bring back Dylan's top message image
         screen.blit(FreeplayWIPtxt, FREE_PLAY_WIP_TXT)
 
-        # Back button
-        pygame.draw.rect(screen, (20, 24, 50), back_rect, border_radius=20)
-        pygame.draw.rect(screen, (190, 195, 255), back_rect, width=2, border_radius=20)
+        # Back button like main menu
+        back_selected = selected_index == 2
+        back_scale = 1.05 if back_selected else 1.0
 
-        back_text = font.render("BACK", True, (245, 245, 255))
-        screen.blit(back_text, back_text.get_rect(center=back_rect.center))
+        bw = int(back_rect.width * back_scale)
+        bh = int(back_rect.height * back_scale)
+        draw_back_rect = pygame.Rect(0, 0, bw, bh)
+        draw_back_rect.center = back_rect.center
+
+        pygame.draw.rect(screen, (8, 11, 28), draw_back_rect, border_radius=24)
+        pygame.draw.rect(screen, (24, 28, 55), draw_back_rect.inflate(-8, -8), border_radius=20)
+
+        back_border = (255, 215, 100) if back_selected else (190, 195, 255)
+        pygame.draw.rect(screen, back_border, draw_back_rect, width=2, border_radius=24)
+
+        back_shadow = button_font.render("BACK", True, (30, 30, 60))
+        screen.blit(back_shadow, back_shadow.get_rect(center=(draw_back_rect.centerx + 2, draw_back_rect.centery + 2)))
+
+        back_text = button_font.render("BACK", True, (245, 245, 255))
+        screen.blit(back_text, back_text.get_rect(center=draw_back_rect.center))
 
         # Draw cards
-        for i, card in enumerate(cards):
-            rect = card["rect"]
+        cards = [
+            (card1_rect, FreeplayWIPlevel),
+            (card2_rect, FreeplayHardlevel),
+        ]
 
+        for i, (rect, image) in enumerate(cards):
             if i == selected_index:
                 scaled_img = pygame.transform.smoothscale(
-                    card["image"],
+                    image,
                     (int(card_w * 1.04), int(card_h * 1.04))
                 )
                 draw_rect = scaled_img.get_rect(center=rect.center)
                 screen.blit(scaled_img, draw_rect)
-
-                # Pointer
-                if pointer_img:
-                    pointer = pygame.transform.smoothscale(pointer_img, (210, 120))
-
-                    if i == 0:
-                        # Normal/Fraq selected: flip pointer and put it on the left
-                        pointer = pygame.transform.flip(pointer, True, False)
-                        pointer_rect = pointer.get_rect(midright=(draw_rect.left + 25, draw_rect.centery))
-                    else:
-                        # Hard selected: normal pointer on the right
-                        pointer_rect = pointer.get_rect(midleft=(draw_rect.right - 25, draw_rect.centery))
-
-                    screen.blit(pointer, pointer_rect)
-
             else:
-                screen.blit(card["image"], rect)
+                draw_rect = rect
+                screen.blit(image, draw_rect)
+
+            # Pointer bounce
+            if pointer_img and i == selected_index:
+                bounce = int(math.sin(pygame.time.get_ticks() * 0.006) * 4)
+                pointer = pygame.transform.smoothscale(pointer_img, (210, 120))
+
+                if i == 0:
+                    # Only Normal/Fraq flips from right to left
+                    pointer = pygame.transform.flip(pointer, True, False)
+                    pointer_rect = pointer.get_rect(
+                        midright=(draw_rect.left + 25, draw_rect.centery + bounce)
+                    )
+                else:
+                    # Hard keeps normal pointer
+                    pointer_rect = pointer.get_rect(
+                        midleft=(draw_rect.right - 25, draw_rect.centery + bounce)
+                    )
+
+                screen.blit(pointer, pointer_rect)
+
+        # Pointer for back button
+        # Pointer for bottom back button
+        if pointer_img and selected_index == 2:
+            bounce = int(math.sin(pygame.time.get_ticks() * 0.006) * 4)
+            pointer = pygame.transform.smoothscale(pointer_img, (190, 110))
+            pointer_rect = pointer.get_rect(
+                midleft=(draw_back_rect.right - 15, draw_back_rect.centery + bounce)
+            )
+            screen.blit(pointer, pointer_rect)
 
         pygame.display.flip()
 
