@@ -205,15 +205,12 @@ def gameplay(screen, selected_song, speed_mult=1.0, time_limit=None):
 
         # Draw
         # End gameplay when the chart is finished
-        if spawn_index >= len(chart_notes) and len(notes) == 0:
-            running = False
+                # Draw
+        _draw_gameplay_frame(screen, notes, accuracy, combo, combo_anim)
+        pygame.display.flip()
 
-        # Also stop if the actual song ends
         if not pygame.mixer.music.get_busy():
             running = False
-
-        pygame.mixer.music.fadeout(400)
-        return 0.0 if force_fail else accuracy
 
     pygame.mixer.music.fadeout(400)
     return 0.0 if force_fail else accuracy
