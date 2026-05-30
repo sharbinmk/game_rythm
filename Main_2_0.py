@@ -125,8 +125,6 @@ for _y in range(HEIGHT):
 
 def draw_bg_layer():
     screen.blit(bg, (0, 0))
-    screen.blit(_grad_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
 # ─── Floating orbs ────────────────────────────────────────────────────────────
 class Orb:
     def __init__(self):
@@ -724,7 +722,8 @@ def draw_main_menu():
     draw_version()
 
 def draw_story_select():
-    draw_bg_layer()
+    screen.fill(DARK)
+    #draw_bg_layer()
     draw_orbs()
     draw_stars()
     draw_page_title("STORY MODE", "Ino's Journey  —  Choose a Chapter", GOLD)
