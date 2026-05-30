@@ -241,3 +241,56 @@ def update_hit_particles():
 def draw_hit_particles(screen):
     for p in hit_particles:
         p.draw(screen)
+
+# ── Character animation ───────────────────────────────────────────────────────
+# The character sits inside / over the CharacterPlaceholder box at (84, 183), 200×200
+# We scale both poses to fit neatly in that zone and draw them centered on it.
+
+CHAR_CENTER_X = 84 + 100   # placeholder center x
+CHAR_BOTTOM_Y = 183 + 210  # sit character just above/at bottom of box
+
+_char_hit_timer  = 0        # frames remaining in hit pose
+_CHAR_HIT_FRAMES = 18       # how long the hit pose holds
+
+# Pre-scaled pose surfaces — built lazily on first call so pygame is ready
+_char_idle_surf = None
+_char_hit_surf  = None
+_char_scale_h   = 190       # target height (fits inside placeholder)
+
+def _get_char_surfs():
+    global _char_idle_surf, _char_hit_surf
+    if _char_idle_surf is None:
+        from assets import ino_idle, ino_hit
+        def _scale(img, target_h):
+            w, h = img.get_size()
+            scale = target_h / h
+            return pygame.transform.smoothscale(img, (int(w * scale), target_h))
+        _char_idle_surf = _scale(ino_idle, _char_scale_h)
+        _char_hit_surf  = _scale(ino_hit,  _char_scale_h)
+    return _char_idle_surf, _char_hit_surf
+
+def trigger_character_hit():
+    global _char_hit_timer
+    _char_hit_timer = _CHAR_HIT_FRAMES
+
+def update_character():
+    global _char_hit_timer
+    if _char_hit_timer > 0:
+        _char_hit_timer -= 1
+
+def draw_character(screen):
+    idle, hit = _get_char_surfs()
+    # Subtle idle bob
+    bob = int(math.sin(pygame.time.get_ticks() * 0.003) * 3)
+
+    if _char_hit_timer > 0:
+        # Hit pose: slight upward pop
+        pop = int(pytweening.easeOutQuad(min(_char_hit_timer / _CHAR_HIT_FRAMES, 1.0)) * 8)
+        surf = hit
+        y_offset = -pop
+    else:
+        surf = idle
+        y_offset = bob
+
+    rect = surf.get_rect(midbottom=(CHAR_CENTER_X, CHAR_BOTTOM_Y + y_offset))
+    screen.blit(surf, rect)
