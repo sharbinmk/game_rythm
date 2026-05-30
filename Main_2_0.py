@@ -7,11 +7,6 @@ import math
 import os
 import sys
 
-sys.path.append("systems")
-
-from freeplay import freeplay
-
- 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PROJECT_ROOT)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "systems"))
@@ -26,6 +21,7 @@ clock = pygame.time.Clock()
 
 from gameplay import gameplay
 from result import result_screen
+from freeplay import freeplay
 
 # ─── Audio ───────────────────────────────────────────────────────────────────
 def _load_sound(path, vol=0.4):
