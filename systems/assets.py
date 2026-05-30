@@ -33,7 +33,7 @@ FreeplayWIPtxt = pygame.image.load(p("Assets/FreeplayWIPtxt.png"))
 FreeplayWIPlevel = pygame.image.load(p("Assets/FreeplayWIPlevel.png"))
 FreeplayExitBtn = pygame.image.load(p("Assets/FreeplayExitBtn.png"))
 FreeplaySelectWIP = pygame.image.load(p("Assets/FreeplaySelectWIP.png"))
-
+FreeplayHardlevel = pygame.image.load(p("Assets/FreeplayHardlevel.png"))
 # Decos
 bgdeco1 = pygame.image.load(p("Assets/bgdeco1.png"))
 bgdeco2 = pygame.image.load(p("Assets/bgdeco2.png"))
