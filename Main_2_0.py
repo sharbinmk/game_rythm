@@ -614,7 +614,9 @@ def _open_freeplay():
     if selected_song:
         pygame.mixer.music.stop()
         acc = gameplay(screen, selected_song)
-        result_screen(screen, acc)
+
+        if acc > 0:
+            result_screen(screen, acc)
 
         try:
             pygame.mixer.music.load("music/Background_Music.mp3")

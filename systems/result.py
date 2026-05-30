@@ -56,7 +56,6 @@ def result_screen(screen, accuracy):
         if blink < 50:
             try:
                 prompt_font = pygame.font.SysFont("georgia", 22)
-                prompt = prompt_font.render("Press ENTER or SPACE to continue", True, (185, 190, 255))
                 screen.blit(prompt, prompt.get_rect(center=(WIDTH // 2, HEIGHT - 36)))
             except:
                 pass

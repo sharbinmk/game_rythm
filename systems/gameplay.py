@@ -30,7 +30,7 @@ def gameplay(screen, selected_song, speed_mult=1.0):
     force_fail  = False
 
     # Effective note speed for this level
-    effective_speed = NOTE_SPEED * speed_mult   # NOTE_SPEED is negative
+    effective_speed = NOTE_SPEED  # NOTE_SPEED is negative
 
     # ── Count-in ──────────────────────────────────────────────────────────────
     countin_sound.play()
@@ -66,7 +66,6 @@ def gameplay(screen, selected_song, speed_mult=1.0):
 
         if esc_held:
             if pygame.time.get_ticks() - esc_hold_start >= ESC_HOLD_LIMIT:
-                force_fail = True
                 running = False
 
         for event in pygame.event.get():
@@ -103,17 +102,17 @@ def gameplay(screen, selected_song, speed_mult=1.0):
         # ── Spawn notes ───────────────────────────────────────────────────────
         current_time = pygame.mixer.music.get_pos()
         # Lead-in window scales with speed so notes appear at the same visual distance
-        lead_in = int(2300 / speed_mult)
+        lead_in = 2250
 
         while spawn_index < len(chart_notes) and \
               current_time >= chart_notes[spawn_index]["time"] - lead_in:
             nt = chart_notes[spawn_index]["type"]
             if nt == "top":
-                notes.append(Note("top",    upper_note_img, speed=effective_speed))
+                notes.append(Note("top", upper_note_img))
             elif nt == "bottom":
-                notes.append(Note("bottom", lower_note_img, speed=effective_speed))
+                notes.append(Note("bottom", lower_note_img))
             elif nt == "dual":
-                notes.append(Note("mid",    dual_note_img,  speed=effective_speed, note_type="dual"))
+                notes.append(Note("mid", dual_note_img, note_type="dual"))
             spawn_index += 1
 
         # ── Update notes ──────────────────────────────────────────────────────
@@ -154,7 +153,7 @@ def gameplay(screen, selected_song, speed_mult=1.0):
             running = False
 
     pygame.mixer.music.fadeout(400)
-    return 0.0 if force_fail else accuracy
+    return accuracy
 
 
 # ─── Hit processing helper ────────────────────────────────────────────────────
