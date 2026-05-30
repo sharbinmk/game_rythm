@@ -7,6 +7,7 @@ from judge import *
 from chartloader import *
 from assets import *
 from gameplayui import *
+from result import result_screen
 import abilities
 
 ESC_HOLD_LIMIT = 2000
@@ -55,14 +56,20 @@ def gameplay(screen, selected_song, speed_mult=1.0):
     pygame.mixer.music.load(chart.track)
     pygame.mixer.music.play()
 
-    notes      = []
-    combo      = 0
-    combo_anim = {"scale": 1.0, "t": 0}
-    running    = True
+    notes        = []
+    combo        = 0
+    combo_anim   = {"scale": 1.0, "t": 0}
+    running      = True
+    game_start   = pygame.time.get_ticks()
+    GAME_LIMIT   = 40000   # 40 seconds in ms
 
     # ── Main loop ─────────────────────────────────────────────────────────────
     while running:
         dt = clock.tick(60)
+
+        # 40 second limit
+        if pygame.time.get_ticks() - game_start >= GAME_LIMIT:
+            running = False
 
         if esc_held:
             if pygame.time.get_ticks() - esc_hold_start >= ESC_HOLD_LIMIT:
@@ -144,6 +151,7 @@ def gameplay(screen, selected_song, speed_mult=1.0):
         update_judgements()
         update_combo_border(combo)
         update_sparkles()
+        update_character()
         _tick_combo_anim(combo_anim)
 
         # ── Draw ──────────────────────────────────────────────────────────────
@@ -154,7 +162,9 @@ def gameplay(screen, selected_song, speed_mult=1.0):
             running = False
 
     pygame.mixer.music.fadeout(400)
-    return 0.0 if force_fail else accuracy
+    final_acc = 0.0 if force_fail else accuracy
+    result_screen(screen, final_acc)
+    return final_acc
 
 
 # ─── Hit processing helper ────────────────────────────────────────────────────
@@ -177,6 +187,7 @@ def _process_hit(result, notes, combo, total_notes, total_score, accuracy, combo
         total_notes += 1
         total_score += acc
         trigger_combo_pop(combo_anim)
+        trigger_character_hit()
         spawn_hit_particles(hit_pos)
 
     accuracy = (total_score / total_notes) * 100 if total_notes else 100.0
@@ -204,6 +215,7 @@ def _draw_gameplay_frame(screen, notes, accuracy, combo, combo_anim):
     screen.blit(skip_btn,     SKIP_BTN_POS)
     screen.blit(accuracy_area, ACCURACY_POS)
     screen.blit(character_placeholder, CHARACTER_PLACEHOLDER_POS)
+    draw_character(screen)
     screen.blit(note_area,    NOTE_AREA_POS)
     screen.blit(play_area_deco, PLAY_AREA_DECO_POS)
     screen.blit(judgement_img, JUDGEMENT_POS)
