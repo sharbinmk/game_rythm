@@ -401,7 +401,7 @@ def _draw_controls_bar(surface):
     top_lbl = tiny_font.render("Top lane", True, LAVENDER)
     surface.blit(top_lbl, (80, bar_y + 34))
     for i, k in enumerate(["A", "S", "D"]):
-        _draw_key(surface, k, 200 + i * 48, bar_y + bar_h // 2)
+        _draw_key(surface, k, 230 + i * 48, bar_y + bar_h // 2)
     pygame.draw.line(surface, (50, 54, 90), (310, bar_y + 10), (310, bar_y + bar_h - 10))
     bot_lbl = tiny_font.render("Bottom lane", True, LAVENDER)
     surface.blit(bot_lbl, (324, bar_y + 34))
@@ -409,9 +409,9 @@ def _draw_controls_bar(surface):
         _draw_key(surface, k, 460 + i * 48, bar_y + bar_h // 2)
     pygame.draw.line(surface, (50, 54, 90), (570, bar_y + 10), (570, bar_y + bar_h - 10))
     esc_lbl = tiny_font.render("Hold ESC to quit", True, (160, 160, 180))
-    surface.blit(esc_lbl, (585, bar_y + 26))
+    surface.blit(esc_lbl, (650, bar_y + 26))
     enter_lbl = tiny_font.render("ENTER = confirm / advance story", True, (160, 160, 180))
-    surface.blit(enter_lbl, (820, bar_y + 26))
+    surface.blit(enter_lbl, (880, bar_y + 26))
 
 def draw_cutscene():
     global _cs_blink
