@@ -219,7 +219,7 @@ STORY_CHAPTERS = [
         "chart": "hard_chapter3_song",
         "speed_mult": 1.2,
         "density": 1.0,
-        "pass_acc": 70.0,
+        "pass_acc": 60.0,
         "time_limit": 60000,
         "intro": [
             "Months have passed. Ino's fingers have grown callused,",
