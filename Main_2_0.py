@@ -257,7 +257,7 @@ STORY_CHAPTERS = [
         "id": 3,
         "title": "Chapter 3: The Concert Hall of Stars",
         "subtitle": "Beethoven — Moonlight Sonata",
-        "chart": "Shar",
+        "chart": "aespa_hold_on_tight",
         "speed_mult": 1.45,
         "density": 1.0,
         "pass_acc": 80.0,
