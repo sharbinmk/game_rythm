@@ -404,9 +404,9 @@ def _draw_controls_bar(surface):
         _draw_key(surface, k, 230 + i * 48, bar_y + bar_h // 2)
     pygame.draw.line(surface, (50, 54, 90), (310, bar_y + 10), (310, bar_y + bar_h - 10))
     bot_lbl = tiny_font.render("Bottom lane", True, LAVENDER)
-    surface.blit(bot_lbl, (324, bar_y + 34))
+    surface.blit(bot_lbl, (334, bar_y + 34))
     for i, k in enumerate(["J", "K", "L"]):
-        _draw_key(surface, k, 460 + i * 48, bar_y + bar_h // 2)
+        _draw_key(surface, k, 480 + i * 48, bar_y + bar_h // 2)
     pygame.draw.line(surface, (50, 54, 90), (570, bar_y + 10), (570, bar_y + bar_h - 10))
     esc_lbl = tiny_font.render("Hold ESC to quit", True, (160, 160, 180))
     surface.blit(esc_lbl, (650, bar_y + 26))
