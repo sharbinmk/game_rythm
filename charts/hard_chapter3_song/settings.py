@@ -1,4 +1,4 @@
-NOTE_SOUND = False
+NOTE_SOUND = True
 NOTE_SPEED = -18
 LEAD_IN = 2600
 

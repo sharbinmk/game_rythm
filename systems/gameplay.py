@@ -146,7 +146,7 @@ def gameplay(screen, selected_song, speed_mult=1.0, time_limit=None):
                 if event.key == pygame.K_ESCAPE:
                     esc_held = False
 
-        # Spawn notes
+        
         current_time = pygame.mixer.music.get_pos()
         lead_in = lead_in_value
 
@@ -162,7 +162,7 @@ def gameplay(screen, selected_song, speed_mult=1.0, time_limit=None):
 
             spawn_index += 1
 
-        # Update notes
+        
         new_notes = []
 
         for note in notes:
@@ -196,16 +196,13 @@ def gameplay(screen, selected_song, speed_mult=1.0, time_limit=None):
 
         notes = new_notes
 
-        # Update UI state
+        
         update_judgements()
         update_combo_border(combo)
         update_sparkles()
         update_character()
         _tick_combo_anim(combo_anim)
 
-        # Draw
-        # End gameplay when the chart is finished
-                # Draw
         _draw_gameplay_frame(screen, notes, accuracy, combo, combo_anim)
         pygame.display.flip()
 
