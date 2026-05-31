@@ -451,11 +451,6 @@ def draw_cutscene():
     # Prompt
     _draw_cutscene_character(screen)
     _draw_controls_bar(screen)
-    _cs_blink = (_cs_blink + 1) % 90
-    if _cs_all_shown and _cs_blink < 55:
-        prompt = "[ENTER] Continue" if not cutscene_is_outro else "[ENTER] Continue  |  [ESC] Chapter Select"
-        p_surf = small_font.render(prompt, True, LAVENDER)
-        screen.blit(p_surf, p_surf.get_rect(center=(WIDTH//2, HEIGHT - 52)))
 
 def handle_cutscene_input(event):
     global state, _cs_char_timer, _cs_chars_shown, _cs_all_shown
